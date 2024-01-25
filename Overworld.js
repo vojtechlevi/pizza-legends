@@ -1,55 +1,51 @@
 class Overworld {
- constructor(config) {
-   this.element = config.element;
-   this.canvas = this.element.querySelector(".game-canvas");
-   this.ctx = this.canvas.getContext("2d");
- }
+  constructor(config) {
+    this.element = config.element;
+    this.canvas = this.element.querySelector(".game-canvas");
+    this.ctx = this.canvas.getContext("2d");
+    this.map = null;
+  }
 
- init() {
-   const image = new Image();
-   image.onload = () => {
-     this.ctx.drawImage(image,0,0)
-   };
-   image.src = "/images/maps/DemoLower.png";
+  startGameLoop() {
+    const step = () => {
+      // Clear the canvas
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+      //Camera person
+      const cameraPerson = this.map.gameObjects.hero;
 
-   const x = 5;
-   const y = 6;
+      // Update all objects
+      Object.values(this.map.gameObjects).forEach((object) => {
+        object.update({
+          arrow: this.directionInput.direction,
+        });
+      });
 
-   const shadow = new Image();
-   shadow.onload = () => {
-    this.ctx.drawImage(
-      shadow, 
-      0, //left cut 
-      0, //top cut,
-      32, //width of cut
-      32, //height of cut
-      x * 16 - 8,
-      y * 16 - 18,
-      32,
-      32
-   )
-   }
-   shadow.src = "/images/characters/shadow.png";
+      // Draw lower layer
+      this.map.drawLowerImage(this.ctx, cameraPerson);
 
+      //Draw game objects
+      Object.values(this.map.gameObjects).forEach((object) => {
+        object.sprite.draw(this.ctx, cameraPerson);
+      });
 
-   const hero = new Image();
-   hero.onload = () => {
-     this.ctx.drawImage(
-       hero, 
-       0, //left cut 
-       0, //top cut,
-       32, //width of cut
-       32, //height of cut
-       x * 16 - 8,
-       y * 16 - 18,
-       32,
-       32
-    )
-   }
-   hero.src = "/images/characters/people/hero.png";
+      // Draw upper layer
+      this.map.drawUpperImage(this.ctx, cameraPerson);
 
+      requestAnimationFrame(() => {
+        step();
+      });
+    };
+    step();
+  }
 
- }
+  init() {
+    this.map = new OverworldMap(window.OverworldMaps.DemoRoom);
 
+    this.directionInput = new DirectionInput();
+    this.directionInput.init();
+    this.directionInput.direction;
+
+    this.startGameLoop();
+  }
 }
