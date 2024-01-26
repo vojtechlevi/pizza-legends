@@ -7,6 +7,10 @@ class DirectionInput {
       ArrowDown: "down",
       ArrowLeft: "left",
       ArrowRight: "right",
+      KeyW: "up",
+      KeyS: "down",
+      KeyA: "left",
+      KeyD: "right",
     };
   }
 
